@@ -14,6 +14,8 @@ class Album extends Component {
       album: album,
       currentSong: album.songs[0],
       currentTime: 0,
+      maxVolume: 100,
+      currentVolume: 0,
       duration: album.songs[0].duration,
       isPlaying: false
     };
@@ -38,17 +40,32 @@ class Album extends Component {
         this.setState({ currentTime: this.audioElement.currentTime });
       },
       durationchange: e => {
-        this.setState({ duration: this.audioElement.duration });
-      }
+        this.setState({ duration: this.audioElement.duration
+        });
+      },
+      volumeupdate: e => {
+       this.setState({
+         currentVolume: this.audioElement.currentVolume
+       });
+     },
+     volumechange: e => {
+       this.setState({
+         maxVolume: this.audioElement.maxVolume
+       });
+     }
     };
     this.audioElement.addEventListener('timeupdate', this.eventListeners.timeupdate);
     this.audioElement.addEventListener('durationchange', this.eventListeners.durationchange);
+    this.audioElement.removeEventListener('volumeupdate', this.eventListeners.volumeupdate);
+    this.audioElement.removeEventListener('volumechange', this.eventListeners.volumechange);
   }
 
   componentWillUnmount() {
     this.audioElement.src = null;
     this.audioElement.removeEventListener('timeupdate', this.eventListeners.timeupdate);
     this.audioElement.removeEventListener('durationchange', this.eventListeners.durationchange);
+    this.audioElement.removeEventListener('volumeupdate', this.eventListeners.volumeupdate);
+    this.audioElement.removeEventListener('volumechange', this.eventListeners.volumechange);
   }
 
   setSong(song) {
@@ -59,10 +76,10 @@ class Album extends Component {
   handleSongClick(song) {
     const isSameSong = this.state.currentSong === song;
     if (this.state.isPlaying && isSameSong) {
-      this.pause();
+      this.pause(song);
     } else {
       if (!isSameSong) { this.setSong(song); }
-      this.play();
+      this.play(song);
     }
   }
 
@@ -99,6 +116,13 @@ class Album extends Component {
     return format;
   }
 
+  handleVolumeChange(e) {
+    this.audioElement.volume = e.target.value;
+    this.setState({
+      currentVolume: e.target.value
+    });
+  }
+
   render() {
     return (
       <section className="album">
@@ -107,25 +131,20 @@ class Album extends Component {
           <div className="album-details">
             <h1 id="album-title">{this.state.album.title}</h1>
             <h2 className="artist">{this.state.album.artist}</h2>
-            <div id="release-info">{this.state.album.releaseInfo}</div>
+            <div id="release-info">{this.state.album.releaseInfo} </div>
           </div>
         </section>
         <table id="song-list">
-          <colgroup>
+          <colgroup className= {this.state.isPlaying ? 'playing' : 'paused'}>
             <col id="song-number-column" />
             <col id="song-title-column" />
             <col id="song-duration-column" />
           </colgroup>
           <tbody>
-            <tr>
-              <th>Number</th>
-              <th>Title</th>
-              <th>Duration</th>
-            </tr>
             {this.state.album.songs.map( (song, index) =>
-              <tr className="song" key={index} onClick={() => this.handleSongClick(song)} >
-                <td className="song-actions">
-                  <button>
+              <tr className= {this.state.isPlaying && this.state.currentSong === song ? 'playing':'paused'} key={index}  >
+                <td onClick={() => this.handleSongClick(song)}>
+                  <button id="play-pause">
                     <span className="song-number">{index + 1}</span>
                     <span className="ion-play"></span>
                     <span className="ion-pause"></span>
@@ -142,10 +161,12 @@ class Album extends Component {
           currentSong={this.state.currentSong}
           currentTime={this.audioElement.currentTime}
           duration={this.audioElement.duration}
+          currentVolume={this.audioElement.currentVolume}
           handleSongClick={() => this.handleSongClick(this.state.currentSong)}
           handlePrevClick={() => this.handlePrevClick()}
           handleNextClick={() => this.handleNextClick()}
           handleTimeChange={(e) => this.handleTimeChange(e)}
+          handleVolumeChange={(e) => this.handleVolumeChange(e)}
           formatTime={(time) => this.formatTime(time)}
         />
       </section>
