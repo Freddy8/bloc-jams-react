@@ -1,3 +1,49 @@
+
+
+tr:hover .ion-play,
+tr.playing
+tr:nth-child(0).paused .ion-play,
+td:active .ion-pause {
+  display: block;
+
+}
+
+tr .ion-play,
+tr .ion-pause,
+tr:hover .song-number,
+td.playing .ion-play,
+tr.playing .song-number,
+tr.playing .ion-play,
+td.paused .song-number {
+  display: none;
+}
+
+tr button:focus {
+  outline: none;
+  text-shadow: 2px 4px 3px hsla(0,0%,0%,0.25);
+}
+
+.song-number {
+
+}
+
+
+#song-list {
+  border-collapse: collapse;
+  font-weight: 100;
+  margin-top: 1rem;
+  margin-bottom: 3rem;
+  overflow: hidden;
+  width: 100%;
+}
+
+
+#time-control input {
+  float: left;
+  width: calc(100% - 80px);
+}
+
+
 .App {
   text-align: center;
 }
@@ -13,6 +59,8 @@
   padding: 20px;
   color: white;
 }
+
+
 
 .App-title {
   font-size: 1.5em;
