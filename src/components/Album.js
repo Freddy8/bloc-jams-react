@@ -17,7 +17,8 @@ class Album extends Component {
       maxVolume: 100,
       currentVolume: 0,
       duration: album.songs[0].duration,
-      isPlaying: false
+      isPlaying: false,
+      hover: false
     };
 
     this.audioElement = document.createElement('audio');
@@ -123,6 +124,31 @@ class Album extends Component {
     });
   }
 
+
+	mouseHoverYes(song){
+		this.setState( {hover: song});
+	}
+
+	mouseHoverNo(song){
+			this.setState( {hover: false});
+	}
+
+	onEnter(song, index){
+		if (this.state.hover !== song) {
+			return <td className="song-number">{index + 1}</td>
+		}
+		if (this.state.isPlaying && this.state.currentSong === song){
+			return <td className="ion-pause"></td>
+		}
+		if (!this.state.isPlaying && this.state.currentSong === song) {
+			return <td className="ion-play"></td>
+		}
+
+		else {
+			return <td className="ion-play"></td>
+		}
+	}
+
   render() {
     return (
       <section className="album">
@@ -141,15 +167,14 @@ class Album extends Component {
             <col id="song-duration-column" />
           </colgroup>
           <tbody>
-            {this.state.album.songs.map( (song, index) =>
-              <tr className= {this.state.isPlaying && this.state.currentSong === song ? 'playing':'paused'} key={index}  >
-                <td onClick={() => this.handleSongClick(song)}>
-                  <button id="play-pause">
-                    <span className="song-number">{index + 1}</span>
-                    <span className="ion-play"></span>
-                    <span className="ion-pause"></span>
-                  </button>
-                </td>
+            {
+              this.state.album.songs.map((song, index) =>
+			  	      <tr className="song" key={index}
+			  	      onClick={() => this.handleSongClick(song)}
+			  	      onMouseEnter={() => this.mouseHoverYes(song)}
+			  	      onMouseLeave={() => this.mouseHoverNo(song)} >
+
+                {this.onEnter(song,index)}
                 <td className="song-title">{song.title}</td>
                 <td className="song-duration">{this.formatTime(song.duration)}</td>
               </tr>
